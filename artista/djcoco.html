@@ -75,6 +75,7 @@ section{padding:56px 0 8px}
 .news small{opacity:.75}
 .t .cd{display:inline-block;font-weight:700;font-size:.85rem;background:var(--sun);color:#1E1A2B;border-radius:999px;padding:2px 12px;margin-top:8px;opacity:1}
 .news h3{font-size:1.1rem;margin:4px 0}
+.news .nimg{display:block;width:100%;max-width:720px;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin:10px 0}
 .filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
 input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--ink);border-radius:12px;padding:10px 14px;min-height:44px;width:100%}
 .filters input,.filters select{width:auto;flex:1 1 180px}
@@ -432,7 +433,8 @@ const cal=n=>{if(!n.e||new Date(n.e+'T23:59:59-03:00')<Date.now())return '';let 
 if(n.h){const a=new Date(n.e+'T'+n.h+':00Z');s=f(a);t=f(new Date(a.getTime()+72e5))}else{const a=new Date(n.e+'T00:00:00Z');s=f(a).slice(0,8);t=f(new Date(a.getTime()+864e5)).slice(0,8)}
 const u='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(n.t)+'&dates='+s+'/'+t+(n.h?'&ctz=America/Argentina/Cordoba':'')+'&details='+encodeURIComponent(n.x)+(n.l?'&location='+encodeURIComponent(n.l):'');
 return `<p><a class="btn alt" href="${u}" target="_blank" rel="noopener">Agendar en mi calendario</a></p>`};
-const news=n=>`<div class="news"><small>${n.d}</small><h3>${n.t}</h3><p>${n.x}</p>${cal(n)}</div>`;
+const abs=u=>/^(https?:|\/)/.test(u)?u:'/'+u;
+const news=n=>`<div class="news"><small>${n.d}</small><h3>${n.t}</h3>${n.i?`<img class="nimg" src="${abs(n.i)}" alt="${n.t}" loading="lazy" onerror="this.remove()">`:''}<p>${n.x}</p>${cal(n)}</div>`;
 const list=(s)=>s.length<=3?`<div style="display:grid;gap:22px">${s.map(bigart).join('')}</div>`:`<div class="grid">${s.map(art).join('')}</div>`;
 const V={
 home:()=>`<div class="hero"><div><h1>Música electrónica hecha en Argentina.</h1><p>Coco Music Producciones es un sello abierto a todos los estilos, y cada artista trae el suyo. Conocé a los artistas y sumate con tu música.</p><p>${HAY_LANZAMIENTOS?`<button class="btn" data-play="1">Escuchar ahora</button> `:''}<a class="btn alt" href="/artistas">Ver artistas</a></p></div><div class="lg"${HAY_LANZAMIENTOS?` data-play="1" role="button" tabindex="0" aria-label="Escuchar el último lanzamiento"`:''}>${LOGO}</div></div>
@@ -445,7 +447,7 @@ ${s.length>3?`<div class="filters"><input id="q" placeholder="Buscar artista" ar
 <div id="al">${list(s)}</div></section></div>`},
 artista:id=>{const a=D.find(x=>x.id===id)||A[0];return `<div class="ban" style="--ac:${a.c}"><span class="tag" style="background:#fff">${a.g}</span><h1 style="margin-top:14px">${a.n}</h1><p style="font-size:1.2rem">${a.t||a.p}</p>${HAY_LANZAMIENTOS?`<button class="btn alt" style="background:#fff" data-play="1">Escuchar</button>`:''}</div>
 <div class="wrap"><section class="two"><div><h2 style="font-size:1.5rem;margin-bottom:12px">Biografía</h2><p>${a.b}</p>${HAY_LANZAMIENTOS?`<h2 style="font-size:1.5rem;margin:32px 0 16px">Discografía</h2><div class="grid">${R.filter(r=>r.a===a.n).map(rel).join('')||'<p class="note">Sin lanzamientos cargados.</p>'}</div>`:''}</div>
-<div><h2 style="font-size:1.5rem;margin-bottom:12px">Próximas fechas</h2><ul class="list"><li><span>Fecha a confirmar</span><span>Córdoba</span></li><li><span>Fecha a confirmar</span><span>Buenos Aires</span></li></ul><p><a class="btn alt" href="/contacto">Contratar para un show</a></p><p class="note">Fotos y bio para prensa: <a href="/contacto">escribinos desde Contacto</a>.</p></div></section></div>`},
+<div>${a.s&&a.s.length?`<h2 style="font-size:1.5rem;margin-bottom:12px">Próximas fechas</h2><ul class="list">${a.s.map(x=>`<li><span>${x.d}</span><span>${x.l}</span></li>`).join('')}</ul>`:`<h2 style="font-size:1.5rem;margin-bottom:12px">Contratación</h2><p>Escribinos para sumar a ${a.n} a tu evento.</p>`}<p><a class="btn alt" href="/contacto">Contratar para un show</a></p><p class="note">Fotos y bio para prensa: <a href="/contacto">escribinos desde Contacto</a>.</p></div></section></div>`},
 lanzamientos:()=>`<div class="wrap"><section><div class="row"><h2>Lanzamientos</h2></div>${HAY_LANZAMIENTOS?`<div class="grid">${R.map(rel).join('')}</div>`:''}${HAY_LANZAMIENTOS?`<p class="note">Tocá una portada para escucharla en el reproductor.</p>`:`<p class="note">Muy pronto, nuestros primeros lanzamientos.</p>`}</section></div>`,
 noticias:()=>`<div class="wrap"><section><div class="row"><h2>Noticias</h2></div>${HAY_NOTICIAS?N.map(news).join(''):`<p class="note">Muy pronto, las novedades del sello.</p>`}</section></div>`,
 nosotros:()=>`<div class="wrap"><section style="max-width:640px"><h2 style="margin-bottom:16px">Nosotros</h2><p>Coco Music Producciones nació en Córdoba, Argentina, de una idea simple. DJ Coco empezó como DJ y después produjo un tema para unos amigos. De ahí surgió la propuesta de armar una discográfica propia, para que pueda enfocarse en lo que le gusta, con el acompañamiento y la estructura para seguir creciendo y trabajar junto a más gente.</p><p>Hoy el sello arranca con DJ Coco, pero nació para crecer. Estamos empezando y las puertas están abiertas a todos los géneros y a todos los artistas que tengan ganas de venir. Si tenés música propia, <a href="/demo">mandanos tu demo</a>.</p></section></div>`,
